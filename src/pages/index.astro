@@ -56,7 +56,7 @@ const line = TAGLINES[0];
 <img class="for-dark" src={`${base}logo/openinfinity-lockup-horizontal-black.svg`} alt="OpenInfinity" width="600" height="118">
 <img class="for-light" src={`${base}logo/openinfinity-lockup-horizontal-white.svg`} alt="" aria-hidden="true" width="600" height="118">
 </h1>
-<p class="intro"><span class="zh">你需要的 Mac 工具，你想象的 AI 智能体，优雅地合而为一。</span><span class="en">Every Mac tool you need, every AI agent you imagine — elegantly, in one app.</span></p>
+<p class="intro"><span class="zh"><span class="nw">你需要的 Mac 工具，</span><span class="nw">你想象的 AI 智能体，</span><br class="lb"><span class="nw">优雅地合而为一。</span></span><span class="en"><span class="nw">Every Mac tool you need,</span> <span class="nw">every AI agent you imagine —</span><br class="lb"> <span class="nw">elegantly, in one app.</span></span></p>
 <p class="eyebrow"><span class="zh">即将推出</span><span class="en">Coming soon</span></p>
 <button class="tagline" type="button" id="tagline" aria-live="polite" title="点击换一句 · Click for another line"><span class="zh">{line.zh}</span><span class="en">{line.en}</span></button>
 <nav class="links" aria-label="Links">
@@ -106,9 +106,12 @@ html[data-lang="zh"] .en, html[data-lang="en"] .zh { display: none !important; }
 :root[data-ink="light"] .logo .for-dark { opacity: 0; }
 :root[data-ink="light"] .logo .for-light { opacity: 1; }
 .intro {
-  max-width: 30ch; margin: 0 0 28px; font-size: clamp(20px, 2.6vw, 30px); line-height: 1.35; font-weight: 500;
-  letter-spacing: -0.015em; text-wrap: balance;
+  max-width: 100%; margin: 0 0 28px; font-size: clamp(20px, 2.4vw, 28px); line-height: 1.4; font-weight: 500;
+  letter-spacing: -0.015em;
 }
+.intro .nw { white-space: nowrap; }
+.intro .lb { display: none; }
+@media (min-width: 760px) { .intro .lb { display: inline; } }
 .eyebrow { margin: 0; font-family: "Geist Mono", ui-monospace, monospace; font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase; }
 .tagline {
   max-width: 40ch; margin: -8px 0 0; padding: 4px 8px; border: 0; border-radius: 10px; background: none; color: inherit; cursor: pointer;
