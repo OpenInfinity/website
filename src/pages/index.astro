@@ -61,6 +61,7 @@ const line = TAGLINES[0];
 <button class="tagline" type="button" id="tagline" aria-live="polite" title="点击换一句 · Click for another line"><span class="zh">{line.zh}</span><span class="en">{line.en}</span></button>
 <nav class="links" aria-label="Links">
 <a class="btn solid" href="https://design.open-infinity.com"><span class="zh">设计资源</span><span class="en">Design resources</span><span aria-hidden="true">→</span></a>
+<a class="btn line" href="https://docs.open-infinity.com"><span class="zh">文档</span><span class="en">Docs</span><span aria-hidden="true">→</span></a>
 </nav>
 </main>
 
@@ -127,6 +128,12 @@ html[data-lang="zh"] .en, html[data-lang="en"] .zh { display: none !important; }
   transition: background-color 1.2s ease, color 1.2s ease, transform 0.15s ease;
 }
 .btn.solid { background: var(--ink); color: var(--paper); }
+.btn.line {
+  border: 1px solid var(--ink); color: var(--ink);
+  background: color-mix(in srgb, var(--paper) 35%, transparent);
+  transition: background-color 1.2s ease, color 1.2s ease, border-color 1.2s ease, transform 0.15s ease;
+}
+.btn.line:hover { background: color-mix(in srgb, var(--paper) 60%, transparent); }
 .btn:hover { transform: translateY(-1px); }
 .btn:active { transform: translateY(0); }
 .foot { position: fixed; left: 50%; bottom: max(16px, env(safe-area-inset-bottom)); transform: translateX(-50%); padding: 6px 12px; border-radius: 999px; font-size: 13px; white-space: nowrap;
