@@ -87,17 +87,27 @@ if (!render) {
   window.addEventListener("resize", draw);
 } else {
   const ease = (k) => (k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2);
+  const n = order.length;
   let phase = Math.random() * 50;
-  let prev = performance.now();
-  const start = prev;
+  // paint the first preset right away so the page never shows an empty canvas
+  render({ ...states[first], phase }, 0);
+  // time starts at the first animation frame: rAF timestamps can precede performance.now()
+  // taken earlier, and a negative time would index a preset that does not exist
+  let start = null;
+  let prev = 0;
   const frame = (now) => {
-    const dt = Math.min(0.05, (now - prev) / 1000);
+    requestAnimationFrame(frame);
+    if (start === null) {
+      start = now;
+      prev = now;
+    }
+    const dt = Math.min(0.05, Math.max(0, (now - prev) / 1000));
     prev = now;
-    const t = (now - start) / 1000;
+    const t = Math.max(0, (now - start) / 1000);
     const seg = Math.floor(t / (HOLD + FADE));
     const local = t - seg * (HOLD + FADE);
-    const a = order[seg % order.length];
-    const b = order[(seg + 1) % order.length];
+    const a = order[seg % n];
+    const b = order[(seg + 1) % n];
     const k = local < HOLD ? 0 : ease((local - HOLD) / FADE);
     const st = blend(states[a], states[b], k);
     phase += dt * st.speed;
@@ -105,7 +115,6 @@ if (!render) {
     render(st, t);
     const ink = inkFor(PRESETS[k < 0.5 ? a : b]);
     if (root.dataset.ink !== ink) root.dataset.ink = ink;
-    requestAnimationFrame(frame);
   };
   requestAnimationFrame(frame);
 }
