@@ -1,0 +1,11 @@
+# OpenInfinity
+
+> Every Mac tool you need, every AI agent you imagine — elegantly, in one app. OpenInfinity is a macOS-first workspace for AI agents, knowledge, automation and collaboration. It is in development and not yet released.
+
+你需要的 Mac 工具，你想象的 AI 智能体，优雅地合而为一。OpenInfinity 是一款以 macOS 为先的 AI 智能体工作台，目前正在开发中，尚未发布。
+
+## Links
+
+- [Documentation / 文档](https://docs.open-infinity.com/): guides and reference (being written)
+- [Design resources / 设计资源](https://design.open-infinity.com/): logo, app icons, colour, typography, motion and brand guidelines
+- [GitHub](https://github.com/OpenInfinity): the OpenInfinity organisation

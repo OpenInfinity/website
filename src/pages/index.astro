@@ -20,6 +20,30 @@ r.setAttribute("data-lang",l);r.lang=l==="zh"?"zh-CN":"en";
 var p=Math.floor(Math.random()*${PRESETS.length});r.setAttribute("data-preset",p);
 r.setAttribute("data-ink",${darkPresets}.indexOf(p)>=0?"light":"dark")})();`;
 const line = TAGLINES[0];
+// structured data: who publishes the site (logo, GitHub) and what the site is
+const orgId = new URL("#organization", siteRoot).href;
+const jsonLd = JSON.stringify({
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": orgId,
+      name: "OpenInfinity",
+      url: siteRoot.href,
+      logo: new URL("icon-512.png", siteRoot).href,
+      sameAs: ["https://github.com/OpenInfinity", "https://design.open-infinity.com/", "https://docs.open-infinity.com/"],
+    },
+    {
+      "@type": "WebSite",
+      "@id": new URL("#website", siteRoot).href,
+      name: "OpenInfinity",
+      url: siteRoot.href,
+      description: "Every Mac tool you need, every AI agent you imagine — elegantly, in one app.",
+      inLanguage: ["zh-CN", "en"],
+      publisher: { "@id": orgId },
+    },
+  ],
+});
 ---
 <!doctype html>
 <html lang="zh-CN" data-lang="zh" data-ink="dark">
@@ -32,6 +56,9 @@ const line = TAGLINES[0];
 <meta property="og:description" content="Every Mac tool you need, every AI agent you imagine — elegantly, in one app. 你需要的 Mac 工具，你想象的 AI 智能体，优雅地合而为一。">
 <meta property="og:image" content={ogImage}>
 <meta property="og:url" content={siteRoot.href}>
+<link rel="canonical" href={siteRoot.href}>
+<link rel="sitemap" href={`${base}sitemap.xml`}>
+<script type="application/ld+json" set:html={jsonLd}></script>
 <meta property="og:type" content="website">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#000000">
