@@ -6,6 +6,7 @@
 
 ## Links
 
-- [Documentation / 文档](https://docs.open-infinity.com/): guides and reference (being written)
-- [Design resources / 设计资源](https://design.open-infinity.com/): logo, app icons, colour, typography, motion and brand guidelines
+- [Home (English)](https://www.open-infinity.com/) · [首页（中文）](https://www.open-infinity.com/zh/)
+- [Documentation](https://docs.open-infinity.com/) · [文档](https://docs.open-infinity.com/zh/): guides and reference (being written)
+- [Design resources](https://design.open-infinity.com/) · [设计资源](https://design.open-infinity.com/zh/): logo, app icons, colour, typography, motion and brand guidelines
 - [GitHub](https://github.com/OpenInfinity): the OpenInfinity organisation

@@ -1,0 +1,224 @@
+---
+// One homepage per language: English at /, Chinese at /zh/ (x-default is English).
+import { PRESETS } from "../data/palettes.js";
+import { TAGLINES } from "../data/taglines.js";
+
+interface Props {
+  lang: "en" | "zh";
+}
+const { lang } = Astro.props;
+
+const T = {
+  en: {
+    htmlLang: "en",
+    title: "OpenInfinity · Coming soon",
+    intro: ["Every Mac tool you need,", "every AI agent you imagine —", "elegantly, in one app."],
+    description: "Every Mac tool you need, every AI agent you imagine — elegantly, in one app.",
+    soon: "Coming soon",
+    another: "Click for another line",
+    design: "Design resources",
+    docs: "Docs",
+    switchTo: "中文",
+    switchLabel: "切换到中文",
+    ogLocale: "en_US",
+  },
+  zh: {
+    htmlLang: "zh-CN",
+    title: "OpenInfinity · 敬请期待",
+    intro: ["你需要的 Mac 工具，", "你想象的 AI 智能体，", "优雅地合而为一。"],
+    description: "你需要的 Mac 工具，你想象的 AI 智能体，优雅地合而为一。",
+    soon: "即将推出",
+    another: "点击换一句",
+    design: "设计资源",
+    docs: "文档",
+    switchTo: "English",
+    switchLabel: "Switch to English",
+    ogLocale: "zh_CN",
+  },
+}[lang];
+
+const base = import.meta.env.BASE_URL.endsWith("/") ? import.meta.env.BASE_URL : `${import.meta.env.BASE_URL}/`;
+const siteRoot = new URL(base, Astro.site);
+const enUrl = siteRoot.href;
+const zhUrl = new URL("zh/", siteRoot).href;
+const pageUrl = lang === "zh" ? zhUrl : enUrl;
+const otherPath = lang === "zh" ? base : `${base}zh/`;
+const ogImage = new URL("og.png", siteRoot).href;
+const designUrl = lang === "zh" ? "https://design.open-infinity.com/zh/" : "https://design.open-infinity.com/";
+const docsUrl = lang === "zh" ? "https://docs.open-infinity.com/zh/" : "https://docs.open-infinity.com/";
+
+// presets whose base colour is dark get white ink; the inline script needs this before first paint
+const darkPresets = JSON.stringify(
+  PRESETS.map((p, i) => [i, p.colors[0]]).filter(([, c]) => parseInt(c.slice(1, 3), 16) < 96).map(([i]) => i),
+);
+const fontFaces = `
+@font-face{font-family:"Geist";src:url("${base}fonts/Geist-Regular.woff2") format("woff2");font-weight:400;font-display:swap}
+@font-face{font-family:"Geist";src:url("${base}fonts/Geist-Medium.woff2") format("woff2");font-weight:500;font-display:swap}
+@font-face{font-family:"Geist Mono";src:url("${base}fonts/GeistMono-Regular.woff2") format("woff2");font-weight:400;font-display:swap}`;
+// Before first paint: send visitors to their language (their own choice > system language: Chinese -> zh,
+// anything else -> en). Crawlers and headless renderers are never redirected, so both versions stay indexable;
+// then pick a preset.
+const headScript = `(function(){var r=document.documentElement;
+try{if(!/bot|crawl|spider|slurp|preview|lighthouse|headless/i.test(navigator.userAgent)){var l=null;try{l=localStorage.getItem("oi-lang")}catch(e){}
+if(l!=="zh"&&l!=="en"){var n=((navigator.languages&&navigator.languages[0])||navigator.language||"").toLowerCase();l=n.indexOf("zh")===0?"zh":"en"}
+if(l!==${JSON.stringify(lang)}){r.style.visibility="hidden";location.replace(${JSON.stringify(otherPath)}+location.search+location.hash);return}}}catch(e){}
+var p=Math.floor(Math.random()*${PRESETS.length});r.setAttribute("data-preset",p);
+r.setAttribute("data-ink",${darkPresets}.indexOf(p)>=0?"light":"dark")})();`;
+const line = TAGLINES[0][lang];
+
+// structured data: who publishes the site (logo, GitHub) and what the site is
+const orgId = new URL("#organization", siteRoot).href;
+const jsonLd = JSON.stringify({
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": orgId,
+      name: "OpenInfinity",
+      url: enUrl,
+      logo: new URL("icon-512.png", siteRoot).href,
+      sameAs: ["https://github.com/OpenInfinity", "https://design.open-infinity.com/", "https://docs.open-infinity.com/"],
+    },
+    {
+      "@type": "WebPage",
+      "@id": `${pageUrl}#webpage`,
+      name: "OpenInfinity",
+      url: pageUrl,
+      description: T.description,
+      inLanguage: T.htmlLang,
+      publisher: { "@id": orgId },
+    },
+  ],
+});
+---
+<!doctype html>
+<html lang={T.htmlLang} data-ink="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>{T.title}</title>
+<meta name="description" content={T.description}>
+<link rel="canonical" href={pageUrl}>
+<link rel="alternate" hreflang="en" href={enUrl}>
+<link rel="alternate" hreflang="zh-CN" href={zhUrl}>
+<link rel="alternate" hreflang="x-default" href={enUrl}>
+<meta property="og:title" content="OpenInfinity">
+<meta property="og:description" content={T.description}>
+<meta property="og:image" content={ogImage}>
+<meta property="og:url" content={pageUrl}>
+<meta property="og:locale" content={T.ogLocale}>
+<meta property="og:type" content="website">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#000000">
+<link rel="sitemap" href={`${base}sitemap.xml`}>
+<script type="application/ld+json" set:html={jsonLd}></script>
+<link rel="icon" href={`${base}favicon.ico`} sizes="48x48">
+<link rel="icon" href={`${base}favicon.svg`} type="image/svg+xml">
+<link rel="apple-touch-icon" href={`${base}apple-touch-icon.png`}>
+<link rel="manifest" href={`${base}site.webmanifest`}>
+<link rel="preload" href={`${base}fonts/Geist-Medium.woff2`} as="font" type="font/woff2" crossorigin>
+<style set:html={fontFaces}></style>
+<script is:inline set:html={headScript}></script>
+</head>
+<body>
+<canvas id="bg" aria-hidden="true"></canvas>
+
+<header class="top">
+<a class="ghost" href="https://github.com/OpenInfinity">GitHub</a>
+<a class="ghost" id="lang" href={otherPath} hreflang={lang === "zh" ? "en" : "zh-CN"} data-lang={lang === "zh" ? "en" : "zh"} aria-label={T.switchLabel}>{T.switchTo}</a>
+</header>
+
+<main class="center">
+<h1 class="logo">
+<img class="for-dark" src={`${base}logo/openinfinity-lockup-horizontal-black.svg`} alt="OpenInfinity" width="600" height="118">
+<img class="for-light" src={`${base}logo/openinfinity-lockup-horizontal-white.svg`} alt="" aria-hidden="true" width="600" height="118">
+</h1>
+<p class="intro"><span class="nw">{T.intro[0]}</span>{lang === "en" ? " " : ""}<span class="nw">{T.intro[1]}</span><br class="lb">{lang === "en" ? " " : ""}<span class="nw">{T.intro[2]}</span></p>
+<p class="eyebrow">{T.soon}</p>
+<button class="tagline" type="button" id="tagline" aria-live="polite" title={T.another}>{line}</button>
+<nav class="links" aria-label="Links">
+<a class="btn solid" href={designUrl}>{T.design}<span aria-hidden="true">→</span></a>
+<a class="btn line" href={docsUrl}>{T.docs}<span aria-hidden="true">→</span></a>
+</nav>
+</main>
+
+<footer class="foot">© 2026 OpenInfinity</footer>
+
+<script>
+import "../scripts/home.js";
+</script>
+
+<style is:global>
+:root { --ink: #000000; --paper: #ffffff; color-scheme: light; }
+:root[data-ink="light"] { --ink: #ffffff; --paper: #000000; color-scheme: dark; }
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+  min-height: 100svh;
+  background: #f6f9ff;
+  color: var(--ink);
+  font-family: "Geist", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  transition: color 1.2s ease;
+}
+#bg { position: fixed; inset: 0; width: 100%; height: 100%; z-index: -1; display: block; }
+
+.top { position: fixed; top: 0; right: 0; display: flex; gap: 8px; padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right)) 0 16px; z-index: 1; }
+.ghost {
+  display: inline-flex; align-items: center; min-height: 40px; padding: 0 16px; border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--ink) 18%, transparent); color: var(--ink);
+  background: color-mix(in srgb, var(--paper) 62%, transparent); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+  font-family: inherit; font-size: 14px; font-weight: 500; line-height: 1; text-decoration: none; cursor: pointer;
+  transition: color 1.2s ease, border-color 1.2s ease, background-color 1.2s ease;
+}
+.ghost:hover { background: color-mix(in srgb, var(--paper) 80%, transparent); }
+
+.center {
+  min-height: 100svh; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 20px; padding: 96px 20px; text-align: center;
+}
+.logo { display: grid; margin: 0 0 12px; }
+.logo img { grid-area: 1 / 1; display: block; width: clamp(240px, 46vw, 600px); height: auto; transition: opacity 1.2s ease; }
+.logo .for-light { opacity: 0; }
+:root[data-ink="light"] .logo .for-dark { opacity: 0; }
+:root[data-ink="light"] .logo .for-light { opacity: 1; }
+.intro {
+  max-width: 100%; margin: 0 0 28px; font-size: clamp(20px, 2.4vw, 28px); line-height: 1.4; font-weight: 500;
+  letter-spacing: -0.015em;
+}
+.intro .nw { white-space: nowrap; }
+.intro .lb { display: none; }
+@media (min-width: 760px) { .intro .lb { display: inline; } }
+.eyebrow { margin: 0; font-family: "Geist Mono", ui-monospace, monospace; font-size: 13px; letter-spacing: 0.14em; text-transform: uppercase; }
+.tagline {
+  max-width: 40ch; margin: -8px 0 0; padding: 4px 8px; border: 0; border-radius: 10px; background: none; color: inherit; cursor: pointer;
+  font: inherit; font-size: clamp(16px, 1.9vw, 20px); line-height: 1.45; font-weight: 400; text-wrap: balance;
+}
+.tagline:hover { background: color-mix(in srgb, var(--ink) 6%, transparent); }
+.tagline.swap { animation: swap 0.5s cubic-bezier(0.22, 1, 0.36, 1); }
+@keyframes swap { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+.links { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 12px; }
+.btn {
+  display: inline-flex; align-items: center; gap: 8px; min-height: 46px; padding: 0 22px; border-radius: 999px;
+  text-decoration: none; font-weight: 500; font-size: 15px;
+  transition: background-color 1.2s ease, color 1.2s ease, transform 0.15s ease;
+}
+.btn.solid { background: var(--ink); color: var(--paper); }
+.btn.line {
+  border: 1px solid var(--ink); color: var(--ink);
+  background: color-mix(in srgb, var(--paper) 35%, transparent);
+  transition: background-color 1.2s ease, color 1.2s ease, border-color 1.2s ease, transform 0.15s ease;
+}
+.btn.line:hover { background: color-mix(in srgb, var(--paper) 60%, transparent); }
+.btn:hover { transform: translateY(-1px); }
+.btn:active { transform: translateY(0); }
+.foot { position: fixed; left: 50%; bottom: max(16px, env(safe-area-inset-bottom)); transform: translateX(-50%); padding: 6px 12px; border-radius: 999px; font-size: 13px; white-space: nowrap;
+  background: color-mix(in srgb, var(--paper) 62%, transparent); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); transition: background-color 1.2s ease; }
+:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}
+</style>
+</body>
+</html>

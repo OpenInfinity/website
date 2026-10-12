@@ -20,31 +20,20 @@ function shuffle(list) {
   return list;
 }
 
-// ---- language (the inline head script already applied the initial choice)
-const TITLES = { zh: "OpenInfinity · 敬请期待", en: "OpenInfinity · Coming soon" };
-function setLang(lang) {
-  root.setAttribute("data-lang", lang);
-  root.lang = lang === "zh" ? "zh-CN" : "en";
-  document.title = TITLES[lang];
-}
-setLang(root.getAttribute("data-lang") === "en" ? "en" : "zh");
-document.getElementById("lang").addEventListener("click", () => {
-  const next = root.getAttribute("data-lang") === "zh" ? "en" : "zh";
-  setLang(next);
-  save("oi-lang", next);
+// ---- language: each language has its own page (/ and /zh/); following the switch remembers the choice
+const lang = root.lang.startsWith("zh") ? "zh" : "en";
+document.getElementById("lang").addEventListener("click", (e) => {
+  save("oi-lang", e.currentTarget.dataset.lang);
 });
 
 // ---- tagline: different from the last visit, click for another
 const tagline = document.getElementById("tagline");
-const zh = tagline.querySelector(".zh");
-const en = tagline.querySelector(".en");
 const last = Number(load("oi-tagline"));
 const lines = shuffle(TAGLINES.map((_, i) => i).filter((i) => i !== last));
 let at = 0;
 function showLine() {
   const i = lines[at % lines.length];
-  zh.textContent = TAGLINES[i].zh;
-  en.textContent = TAGLINES[i].en;
+  tagline.textContent = TAGLINES[i][lang];
   save("oi-tagline", String(i));
 }
 showLine();
